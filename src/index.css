@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Inter', 'Poppins', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: dark;
+  color: #fff;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  @apply text-white overflow-x-hidden;
+  /* Multi-layer gradient background matching the spec */
+  background: radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
+              radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
+              radial-gradient(circle at 50% 80%, rgba(20, 184, 166, 0.1) 0%, transparent 50%),
+              #0f172a; /* Soft futuristic slate base, NOT pure black */
+  background-attachment: fixed;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.8);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.5);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.8);
+}
+
+@layer components {
+  /* Glassmorphism Classes */
+  .glass {
+    @apply backdrop-blur-xl bg-white/10 border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.15)];
+  }
+
+  .glass-card {
+    @apply backdrop-blur-xl bg-white/[0.08] border border-white/20 rounded-2xl shadow-xl transition-all duration-300;
+  }
+  
+  .glass-nav {
+    @apply backdrop-blur-xl bg-[#0f172a]/70 border-b border-white/10;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-teal-300 to-purple-400;
+  }
+
+  .btn-primary {
+    @apply relative overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium rounded-full px-8 py-3 transition-all duration-300 hover:shadow-[0_0_20px_rgba(139,92,246,0.5)] hover:scale-105;
+  }
+
+  .btn-secondary {
+    @apply backdrop-blur-md bg-white/10 border border-white/20 hover:bg-white/20 text-white font-medium rounded-full px-8 py-3 transition-all duration-300 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:scale-105;
+  }
+
+  .section-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24;
+  }
+}
