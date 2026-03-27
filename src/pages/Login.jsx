@@ -65,6 +65,23 @@ const Login = () => {
               alt="Workspace" 
               className="w-full h-full object-cover mix-blend-luminosity brightness-50"
             />
+
+            {/* Quote "On Screen" Overlay */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 1.5, duration: 1 }}
+              className="absolute top-[48%] left-[48%] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+            >
+              <div className="relative group">
+                <div className="absolute -inset-4 bg-blue-500/10 blur-xl rounded-full opacity-50"></div>
+                
+                <h3 className="relative text-lg md:text-xl font-black tracking-tight text-white/30 font-mono uppercase italic border-y border-white/5 py-1 px-4 backdrop-blur-[1px] leading-tight text-center">
+                   Connecting Care <br/> 
+                   <span className="text-white/50 tracking-widest">Seamlessly</span>
+                </h3>
+              </div>
+            </motion.div>
           </motion.div>
           
           {/* Layered Gradient Overlays for Depth */}

@@ -34,6 +34,25 @@ const Signup = () => {
               alt="Technology Workspace" 
               className="w-full h-full object-cover mix-blend-overlay brightness-40"
             />
+            
+            {/* Project Title "On Screen" Overlay */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 1.5, duration: 1 }}
+              className="absolute top-[42%] left-[48%] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+            >
+              <div className="relative group">
+                {/* Screen Glow */}
+                <div className="absolute -inset-4 bg-teal-500/10 blur-xl rounded-full opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                
+                {/* Text styled as Screen UI */}
+                <h3 className="relative text-lg md:text-xl font-black tracking-tight text-white/40 font-mono uppercase italic border-y border-white/5 py-1 px-4 backdrop-blur-[2px] leading-tight text-center">
+                   Connecting Care <br/> 
+                   <span className="text-white/60 tracking-widest">With Precision</span>
+                </h3>
+              </div>
+            </motion.div>
           </motion.div>
           
           {/* Layered Gradient Overlays for Depth */}
