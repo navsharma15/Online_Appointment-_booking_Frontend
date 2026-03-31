@@ -31,12 +31,15 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded bg-blue-600 flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-white" />
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="relative">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform duration-300">
+                <Calendar className="w-5 h-5 text-white" strokeWidth={2.5} />
+              </div>
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full border-2 border-slate-900 shadow-sm animate-pulse"></div>
             </div>
-            <span className="text-xl font-bold text-white">
-              Apoint<span className="text-blue-500">Hub</span>
+            <span className="text-2xl font-black tracking-tight text-white flex items-center font-outfit">
+              Apoint<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400 ml-0.5">Hub</span>
             </span>
           </Link>
 

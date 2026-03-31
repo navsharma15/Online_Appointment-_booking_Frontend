@@ -19,11 +19,16 @@ const Signup = () => {
       <div className="w-full max-w-md bg-slate-900 border border-white/10 rounded-xl shadow-2xl p-6">
         
         {/* Logo and Titles */}
-        <div className="flex flex-col items-center mb-6">
-          <div className="w-10 h-10 rounded-lg bg-teal-600 flex items-center justify-center mb-3">
-            <Calendar className="w-5 h-5 text-white" />
+        <div className="flex flex-col items-center mb-6 px-10 text-center">
+          <div className="relative mb-3">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <Calendar className="w-6 h-6 text-white" strokeWidth={2.5} />
+            </div>
+            <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-slate-900 shadow-sm animate-pulse"></div>
           </div>
-          <h1 className="text-xl font-bold text-white tracking-tight">Create Workspace</h1>
+          <h1 className="text-2xl font-black text-white tracking-tight font-outfit">
+            Apoint<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Hub</span>
+          </h1>
           <p className="text-slate-400 text-xs mt-1">Start your journey today.</p>
         </div>
 

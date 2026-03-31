@@ -45,11 +45,14 @@ const Sidebar = ({ role }) => {
       {/* Sidebar Header */}
       <div className="p-6">
         <Link to="/" className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded bg-blue-600 flex items-center justify-center">
-            <CalendarIcon className="w-4 h-4 text-white" />
+          <div className="relative">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <CalendarIcon className="w-4 h-4 text-white" strokeWidth={2.5} />
+            </div>
+            <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-slate-900 shadow-sm animate-pulse"></div>
           </div>
-          <span className="text-lg font-bold text-white">
-            Apoint<span className="text-blue-500">Hub</span>
+          <span className="text-xl font-black tracking-tight text-white flex items-center font-outfit">
+            Apoint<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400 ml-0.5">Hub</span>
           </span>
         </Link>
       </div>
