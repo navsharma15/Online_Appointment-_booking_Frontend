@@ -36,13 +36,6 @@ const Hero = () => {
             </div>
             
             <div className="flex items-center gap-4 pt-6 text-[10px] text-slate-500 font-black uppercase tracking-widest">
-              <div className="flex -space-x-3">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="w-8 h-8 rounded-full border-2 border-slate-900 bg-slate-800 flex items-center justify-center overflow-hidden">
-                    <img src={`https://i.pravatar.cc/100?img=${i + 15}`} alt="User avatar" />
-                  </div>
-                ))}
-              </div>
               <p>Loved by 10,000+ businesses world-wide</p>
             </div>
           </div>
