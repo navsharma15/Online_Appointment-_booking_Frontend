@@ -1,7 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Check } from 'lucide-react';
+import PaymentModal from './PaymentModal';
 
 const Pricing = () => {
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+
+  const handlePlanClick = (plan) => {
+    setSelectedPlan(plan);
+    setIsPaymentModalOpen(true);
+  };
+
+  const handlePaymentSelect = (method) => {
+    console.log(`Payment method selected: ${method} for ${selectedPlan.name} plan`);
+    // Here you can integrate with your payment gateway
+    setIsPaymentModalOpen(false);
+    alert(`Proceeding with ${method} payment for ${selectedPlan.name} plan ($${selectedPlan.price})`);
+  };
+
   const plans = [
     {
       name: 'Basic',
@@ -79,6 +95,7 @@ const Pricing = () => {
               </ul>
 
               <button 
+                onClick={() => handlePlanClick(plan)}
                 className={`w-full py-3 rounded-lg font-medium transition-colors ${
                   plan.highlight
                     ? 'bg-blue-600 text-white hover:bg-blue-700'
@@ -91,6 +108,14 @@ const Pricing = () => {
           ))}
         </div>
       </div>
+      
+      <PaymentModal 
+        isOpen={isPaymentModalOpen}
+        planName={selectedPlan?.name}
+        planPrice={selectedPlan?.price}
+        onClose={() => setIsPaymentModalOpen(false)}
+        onPaymentSelect={handlePaymentSelect}
+      />
     </section>
   );
 };
