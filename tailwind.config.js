@@ -31,6 +31,10 @@ export default {
       },
       backdropBlur: {
         'glass': '12px',
+      },
+      fontFamily: {
+        sans: ['"Outfit"', 'sans-serif'],
+        outfit: ['"Outfit"', 'sans-serif'],
       }
     },
   },

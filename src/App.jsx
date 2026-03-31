@@ -22,7 +22,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="font-['Inter'] min-h-screen text-white bg-slate-950 overflow-x-hidden">
+        <div className="font-sans min-h-screen text-white bg-slate-950 overflow-x-hidden">
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
