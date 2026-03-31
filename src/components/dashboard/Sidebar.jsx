@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { 
   LayoutDashboard, 
   CalendarPlus, 
@@ -21,19 +20,17 @@ const Sidebar = ({ role }) => {
   const { logout, user } = useAuth();
 
   const userLinks = [
-    { name: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" />, href: '/user/dashboard' },
-    { name: 'Book Appointment', icon: <CalendarPlus className="w-5 h-5" />, href: '/user/book' },
-    { name: 'My Appointments', icon: <CalendarRange className="w-5 h-5" />, href: '/user/appointments' },
-    { name: 'History', icon: <History className="w-5 h-5" />, href: '/user/history' },
-    { name: 'Profile', icon: <UserCircle className="w-5 h-5" />, href: '/user/profile' },
+    { name: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" />, href: '/user/dashboard' },
+    { name: 'Appointments', icon: <CalendarRange className="w-4 h-4" />, href: '/user/appointments' },
+    { name: 'Book New', icon: <CalendarPlus className="w-4 h-4" />, href: '/user/book' },
+    { name: 'Profile', icon: <UserCircle className="w-4 h-4" />, href: '/user/profile' },
   ];
 
   const adminLinks = [
-    { name: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" />, href: '/admin/dashboard' },
-    { name: 'Users', icon: <Users className="w-5 h-5" />, href: '/admin/users' },
-    { name: 'Appointments', icon: <CalendarRange className="w-5 h-5" />, href: '/admin/appointments' },
-    { name: 'Analytics', icon: <BarChart3 className="w-5 h-5" />, href: '/admin/analytics' },
-    { name: 'Settings', icon: <Settings className="w-5 h-5" />, href: '/admin/settings' },
+    { name: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4" />, href: '/admin/dashboard' },
+    { name: 'Users', icon: <Users className="w-4 h-4" />, href: '/admin/users' },
+    { name: 'Analytics', icon: <BarChart3 className="w-4 h-4" />, href: '/admin/analytics' },
+    { name: 'Settings', icon: <Settings className="w-4 h-4" />, href: '/admin/settings' },
   ];
 
   const links = role === 'admin' ? adminLinks : userLinks;
@@ -44,67 +41,57 @@ const Sidebar = ({ role }) => {
   };
 
   return (
-    <div className="w-72 h-screen fixed left-0 top-0 glass-card bg-slate-900/60 border-r border-white/10 flex flex-col z-30 m-0 rounded-none overflow-hidden">
+    <div className="w-64 h-screen fixed left-0 top-0 bg-slate-900 border-r border-white/10 flex flex-col z-30">
       {/* Sidebar Header */}
-      <div className="p-8 pb-10">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center p-[1px] shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-            <div className="w-full h-full bg-slate-900 rounded-[11px] flex items-center justify-center backdrop-blur-sm bg-opacity-80">
-              <CalendarIcon className="w-5 h-5 text-white" />
-            </div>
+      <div className="p-6">
+        <Link to="/" className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded bg-blue-600 flex items-center justify-center">
+            <CalendarIcon className="w-4 h-4 text-white" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-white">
-            Apoint<span className="text-blue-400">Hub</span>
+          <span className="text-lg font-bold text-white">
+            Apoint<span className="text-blue-500">Hub</span>
           </span>
-        </div>
+        </Link>
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
+      <nav className="flex-1 px-4 space-y-1">
         {links.map((link) => {
           const isActive = location.pathname === link.href;
           return (
             <Link
               key={link.name}
               to={link.href}
-              className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium transition-all duration-300 relative group ${
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive 
-                  ? 'bg-blue-500/10 text-white' 
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-blue-600 text-white' 
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
               }`}
             >
-              <span className={`transition-colors duration-300 ${isActive ? 'text-blue-400' : 'group-hover:text-blue-400'}`}>
-                {link.icon}
-              </span>
+              {link.icon}
               {link.name}
-              {isActive && (
-                <motion.div 
-                  layoutId="sidebarActive"
-                  className="absolute left-0 w-1 h-6 bg-blue-500 rounded-full"
-                />
-              )}
             </Link>
           );
         })}
       </nav>
 
-      {/* Sidebar Footer / User Info */}
-      <div className="p-4 border-t border-white/10">
-        <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/5 mb-4">
-          <div className="w-10 h-10 rounded-full bg-blue-500/20 border border-blue-500/20 flex items-center justify-center text-blue-400 font-bold">
+      {/* User Info & Logout */}
+      <div className="p-4 border-t border-white/5 space-y-4">
+        <div className="flex items-center gap-3 px-2">
+          <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold text-blue-500 border border-white/5">
             {user?.name?.charAt(0)}
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0">
             <p className="text-xs font-bold text-white truncate">{user?.name}</p>
-            <p className="text-[10px] text-slate-500 truncate uppercase tracking-widest">{user?.role}</p>
+            <p className="text-[10px] text-slate-500 uppercase">{user?.role}</p>
           </div>
         </div>
         
         <button 
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-300 active:scale-95"
+          className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium text-red-500 hover:bg-red-500/10 transition-colors"
         >
-          <LogOut className="w-5 h-5" />
+          <LogOut className="w-4 h-4" />
           Logout
         </button>
       </div>
