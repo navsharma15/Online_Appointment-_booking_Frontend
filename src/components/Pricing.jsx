@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
 
 const Pricing = () => {
@@ -34,45 +33,28 @@ const Pricing = () => {
   ];
 
   return (
-    <section id="pricing" className="relative py-24 z-20">
-      <div className="section-container">
+    <section id="pricing" className="py-24 bg-slate-900">
+      <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-16">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-3xl md:text-5xl font-bold mb-6"
-          >
-            Simple, Transparent <span className="text-gradient">Pricing</span>
-          </motion.h2>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-slate-400 max-w-2xl mx-auto text-lg"
-          >
+          <h2 className="text-3xl md:text-5xl font-bold mb-6">Simple, Transparent Pricing</h2>
+          <p className="text-slate-400 max-w-2xl mx-auto text-lg">
             No hidden fees. No surprises. Choose the plan that fits your business needs.
-          </motion.p>
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center max-w-6xl mx-auto">
-          {plans.map((plan, index) => (
-            <motion.div
+          {plans.map((plan) => (
+            <div
               key={plan.name}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: index * 0.2 }}
-              className={`relative rounded-3xl p-8 transition-transform duration-300 hover:-translate-y-2 ${
+              className={`relative rounded-2xl p-8 border ${
                 plan.highlight 
-                  ? 'glass-card border-blue-500/50 shadow-[0_0_40px_rgba(59,130,246,0.3)] bg-gradient-to-b from-slate-900/90 to-blue-900/20 scale-105 z-10' 
-                  : 'glass bg-slate-900/60 border-white/10'
+                  ? 'bg-slate-800 border-blue-500 shadow-lg scale-105 z-10' 
+                  : 'bg-slate-800/50 border-white/10'
               }`}
             >
               {plan.highlight && (
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                  <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider drop-shadow-md">
+                  <span className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
                     Most Popular
                   </span>
                 </div>
@@ -82,7 +64,7 @@ const Pricing = () => {
                 <h3 className="text-2xl font-semibold text-white mb-2">{plan.name}</h3>
                 <p className="text-slate-400 text-sm h-10">{plan.description}</p>
                 <div className="mt-6 flex items-baseline">
-                  <span className="text-5xl font-extrabold text-white">{plan.price}</span>
+                  <span className="text-4xl font-bold text-white">{plan.price}</span>
                   <span className="text-slate-400 ml-2">{plan.period}</span>
                 </div>
               </div>
@@ -90,24 +72,22 @@ const Pricing = () => {
               <ul className="space-y-4 mb-8">
                 {plan.features.map((feature, i) => (
                   <li key={i} className="flex items-center text-slate-300">
-                    <div className={`mr-3 rounded-full p-1 ${plan.highlight ? 'bg-blue-500/20 text-blue-400' : 'bg-white/10 text-white'}`}>
-                      <Check className="w-4 h-4" />
-                    </div>
+                    <Check className={`w-4 h-4 mr-3 ${plan.highlight ? 'text-blue-400' : 'text-slate-500'}`} />
                     <span className="text-sm">{feature}</span>
                   </li>
                 ))}
               </ul>
 
               <button 
-                className={`w-full py-3 rounded-xl font-medium transition-all duration-300 ${
+                className={`w-full py-3 rounded-lg font-medium transition-colors ${
                   plan.highlight
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:shadow-[0_0_20px_rgba(139,92,246,0.5)]'
+                    ? 'bg-blue-600 text-white hover:bg-blue-700'
                     : 'bg-white/10 text-white hover:bg-white/20'
                 }`}
               >
                 {plan.buttonText}
               </button>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
