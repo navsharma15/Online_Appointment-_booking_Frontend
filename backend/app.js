@@ -1,6 +1,6 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const authRoutes = require('./routes/authRoutes');
 const doctorRoutes = require('./routes/doctorRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
@@ -8,10 +8,10 @@ const errorHandler = require('./middleware/errorHandler');
 
 const connectDB = require('./config/db');
 
-// Load environment variables
-dotenv.config();
-
 const app = express();
+
+// Health check for Vercel debugging
+app.get('/api/health', (req, res) => res.json({ status: 'ok', message: 'Backend is connected!' }));
 
 // Middleware
 app.use(cors());
@@ -37,8 +37,11 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+// Only listen if not running as a Vercel serverless function
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
 
 module.exports = app;
