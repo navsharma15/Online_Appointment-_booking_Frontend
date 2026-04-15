@@ -1,9 +1,49 @@
 import React, { useState } from 'react';
-import { Calendar, User, Mail, Lock, ArrowRight, Eye, EyeOff, Home } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Calendar, User, Mail, Lock, Phone, ArrowRight, Eye, EyeOff, Home, AlertCircle } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    phone: ''
+  });
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const { signup } = useAuth();
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
+
+    const userData = {
+      name: `${formData.firstName} ${formData.lastName}`.trim(),
+      email: formData.email,
+      password: formData.password,
+      phone: formData.phone
+    };
+
+    const result = await signup(userData);
+
+    if (result.success) {
+      alert('Account created successfully! Please sign in.');
+      navigate('/login');
+    } else {
+      setError(result.message);
+    }
+    setIsLoading(false);
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-950">
@@ -32,13 +72,24 @@ const Signup = () => {
           <p className="text-slate-400 text-xs mt-1">Start your journey today.</p>
         </div>
 
-        <form className="space-y-4">
+        {error && (
+          <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center gap-3 text-red-400 text-xs">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <p>{error}</p>
+          </div>
+        )}
+
+        <form className="space-y-4" onSubmit={handleSignup}>
           <div className="grid grid-cols-2 gap-4 text-xs font-medium text-slate-300">
             <div className="space-y-1">
               <label>First Name</label>
               <input 
                 type="text" 
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
                 placeholder="John" 
+                required
                 className="w-full bg-slate-800 border border-white/10 rounded-lg py-2 px-3 text-white placeholder-slate-500 focus:outline-none focus:border-teal-500"
               />
             </div>
@@ -46,7 +97,11 @@ const Signup = () => {
               <label>Last Name</label>
               <input 
                 type="text" 
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
                 placeholder="Doe" 
+                required
                 className="w-full bg-slate-800 border border-white/10 rounded-lg py-2 px-3 text-white placeholder-slate-500 focus:outline-none focus:border-teal-500"
               />
             </div>
@@ -60,7 +115,29 @@ const Signup = () => {
               </div>
               <input 
                 type="email" 
-                placeholder="you@hospital.com" 
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="you@example.com" 
+                required
+                className="w-full bg-slate-800 border border-white/10 rounded-lg py-2 pl-10 pr-4 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-teal-500"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-slate-300">Phone Number</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                <Phone className="w-4 h-4" />
+              </div>
+              <input 
+                type="tel" 
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                placeholder="+1 234 567 890" 
+                required
                 className="w-full bg-slate-800 border border-white/10 rounded-lg py-2 pl-10 pr-4 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-teal-500"
               />
             </div>
@@ -74,7 +151,11 @@ const Signup = () => {
               </div>
               <input 
                 type={showPassword ? 'text' : 'password'} 
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
                 placeholder="••••••••" 
+                required
                 className="w-full bg-slate-800 border border-white/10 rounded-lg py-2 pl-10 pr-10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-teal-500"
               />
               <button 
@@ -87,20 +168,13 @@ const Signup = () => {
             </div>
           </div>
 
-          <div className="flex items-start gap-2 mt-2 p-3 bg-slate-800/50 rounded-lg border border-white/5">
-            <input 
-              type="checkbox" 
-              id="terms" 
-              className="mt-0.5 w-3.5 h-3.5 rounded border-white/10 bg-slate-900 text-teal-500 focus:ring-teal-500 focus:ring-offset-0"
-            />
-            <label htmlFor="terms" className="text-[10px] text-slate-500 cursor-pointer select-none leading-relaxed">
-              I agree to the <a href="#" className="underline text-slate-400">Terms of Service</a> and confirm our <a href="#" className="underline text-slate-400">Privacy Policy</a> about data.
-            </label>
-          </div>
-
-          <button className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors mt-4 text-sm shadow-lg shadow-teal-900/10 group">
-            Complete Onboarding
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          <button 
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors mt-4 text-sm shadow-lg shadow-teal-900/10 group disabled:opacity-50"
+          >
+            {isLoading ? "Creating Account..." : "Complete Onboarding"}
+            {!isLoading && <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
           </button>
         </form>
 
@@ -108,23 +182,6 @@ const Signup = () => {
           <p className="text-xs text-slate-400">
             Already verified? <Link to="/login" className="text-teal-400 font-bold hover:underline ml-1">Sign In</Link>
           </p>
-        </div>
-
-        {/* Demo Signup Hint */}
-        <div className="mt-6 p-3 bg-teal-500/5 rounded-lg border border-teal-500/10">
-          <p className="text-[10px] font-bold text-teal-400 uppercase tracking-wider mb-2">Demo Hints:</p>
-          <div className="grid grid-cols-2 gap-4 text-[10px] text-slate-400">
-            <div>
-              <p className="text-slate-300 font-bold underline mb-1">User:</p>
-              <p>name@gmail.com</p>
-              <p>Pass: 1234</p>
-            </div>
-            <div>
-              <p className="text-slate-300 font-bold underline mb-1">Admin:</p>
-              <p>adminname@gmail.com</p>
-              <p>Pass: 1234</p>
-            </div>
-          </div>
         </div>
       </div>
     </div>

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { 
   Check, 
   ChevronRight, 
@@ -9,18 +10,38 @@ import {
   Stethoscope,
   HeartPulse,
   Syringe,
-  Activity
+  Activity,
+  AlertCircle
 } from 'lucide-react';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
+import { useNavigate } from 'react-router-dom';
 
 const BookAppointment = () => {
   const [step, setStep] = useState(1);
+  const [doctors, setDoctors] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const [bookingData, setBookingData] = useState({
     service: '',
-    provider: '',
+    doctor_id: '',
+    doctor_name: '',
     date: '',
     time: ''
   });
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/doctors');
+        setDoctors(response.data);
+      } catch (err) {
+        console.error('Failed to fetch doctors', err);
+      }
+    };
+    fetchDoctors();
+  }, []);
 
   const services = [
     { id: '1', title: 'General Checkup', icon: <Stethoscope className="w-5 h-5" />, price: '$50', duration: '30 min' },
@@ -29,7 +50,28 @@ const BookAppointment = () => {
     { id: '4', title: 'Blood Test', icon: <Activity className="w-5 h-5" />, price: '$40', duration: '20 min' },
   ];
 
-  const timeSlots = ['09:00 AM', '10:00 AM', '11:30 AM', '01:00 PM', '02:30 PM', '04:00 PM'];
+  const handleConfirm = async () => {
+    setIsLoading(true);
+    setError('');
+    const token = localStorage.getItem('hub_token');
+
+    try {
+      await axios.post('http://localhost:5000/api/appointments', {
+        doctor_id: bookingData.doctor_id,
+        date: bookingData.date,
+        time: bookingData.time
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      alert('Appointment Booked Successfully!');
+      navigate('/user/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to book appointment');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const nextStep = () => setStep(prev => prev + 1);
   const prevStep = () => setStep(prev => prev - 1);
@@ -54,6 +96,13 @@ const BookAppointment = () => {
              </div>
            ))}
         </div>
+
+        {error && (
+          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-400 text-sm">
+            <AlertCircle className="w-5 h-5" />
+            <p>{error}</p>
+          </div>
+        )}
 
         <div className="bg-slate-900 border border-white/10 p-8 rounded-xl shadow-sm">
           {/* STEP 1: SELECT SERVICE */}
@@ -101,18 +150,29 @@ const BookAppointment = () => {
                  <p className="text-slate-400 text-xs text-slate-500 italic">"Select from our team of professional doctors."</p>
                </div>
                
-               <div className="space-y-2">
-                  {['Dr. Sarah Wilson', 'Dr. Michael Chen', 'Dr. Amanda Rivera'].map((name) => (
+               <div className="grid grid-cols-1 gap-3">
+                  {doctors.map((doctor) => (
                     <button 
-                      key={name}
-                      onClick={() => { setBookingData({...bookingData, provider: name}); nextStep(); }}
+                      key={doctor._id}
+                      onClick={() => { 
+                        setBookingData({
+                          ...bookingData, 
+                          doctor_id: doctor._id, 
+                          doctor_name: doctor.name,
+                          available_slots: doctor.available_slots
+                        }); 
+                        nextStep(); 
+                      }}
                       className="w-full p-4 rounded-xl bg-slate-800 border border-white/5 flex items-center justify-between group hover:border-blue-500 transition-colors"
                     >
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 rounded-lg bg-slate-900 border border-white/5 flex items-center justify-center font-bold text-blue-500 text-sm">
-                          {name.split(' ')[1].charAt(0)}
+                          {doctor.name.charAt(4)}
                         </div>
-                        <p className="font-bold text-white text-sm">{name}</p>
+                        <div className="text-left">
+                          <p className="font-bold text-white text-sm">{doctor.name}</p>
+                          <p className="text-[10px] text-slate-500 uppercase tracking-wider">{doctor.specialization}</p>
+                        </div>
                       </div>
                       <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-white" />
                     </button>
@@ -137,6 +197,7 @@ const BookAppointment = () => {
                        <label className="text-[10px] font-bold uppercase text-slate-500">Pick Date</label>
                        <input 
                          type="date" 
+                         min={new Date().toISOString().split('T')[0]}
                          onChange={(e) => setBookingData({...bookingData, date: e.target.value})}
                          className="w-full bg-slate-800 border border-white/10 rounded-lg py-2.5 px-4 text-xs text-white focus:outline-none focus:border-blue-500 transition-colors"
                        />
@@ -145,7 +206,7 @@ const BookAppointment = () => {
                     <div className="space-y-3">
                        <label className="text-[10px] font-bold uppercase text-slate-500">Available Slots</label>
                        <div className="grid grid-cols-2 gap-2">
-                          {timeSlots.map(t => (
+                          {(bookingData.available_slots || []).map(t => (
                             <button 
                               key={t}
                               onClick={() => setBookingData({...bookingData, time: t})}
@@ -194,7 +255,7 @@ const BookAppointment = () => {
                   </div>
                   <div className="space-y-1">
                      <p className="text-[10px] font-bold text-slate-500 uppercase">Doctor</p>
-                     <p className="text-sm font-bold text-white">{bookingData.provider}</p>
+                     <p className="text-sm font-bold text-white">{bookingData.doctor_name}</p>
                   </div>
                   <div className="space-y-1">
                      <p className="text-[10px] font-bold text-slate-500 uppercase">Date</p>
@@ -208,8 +269,12 @@ const BookAppointment = () => {
 
                <div className="flex items-center justify-between pt-6 border-t border-white/5">
                   <button onClick={prevStep} className="text-[10px] font-bold uppercase text-slate-500 hover:text-white">Go Back</button>
-                  <button className="bg-blue-600 text-white px-8 py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-900/20">
-                    Confirm Appointment
+                  <button 
+                    disabled={isLoading}
+                    onClick={handleConfirm}
+                    className="bg-blue-600 text-white px-8 py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-900/20 disabled:opacity-50"
+                  >
+                    {isLoading ? 'Booking...' : 'Confirm Appointment'}
                   </button>
                </div>
             </div>

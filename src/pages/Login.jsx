@@ -17,14 +17,12 @@ const Login = () => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 800));
-    const result = login(email, password);
+    
+    const result = await login(email, password);
+    
     if (result.success) {
-      if (result.role === 'admin') {
-        navigate('/admin/dashboard');
-      } else {
-        navigate('/user/dashboard');
-      }
+      // For now redirecting to user dashboard. In a real app we might check role.
+      navigate('/user/dashboard');
     } else {
       setError(result.message);
     }
@@ -125,22 +123,7 @@ const Login = () => {
           </p>
         </div>
 
-        {/* Demo Credentials Hint */}
-        <div className="mt-6 p-3 bg-blue-500/5 rounded-lg border border-blue-500/10">
-          <p className="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-2">Demo Hints:</p>
-          <div className="grid grid-cols-2 gap-4 text-[10px] text-slate-400">
-            <div>
-              <p className="text-slate-300 font-bold underline mb-1">User:</p>
-              <p>name@gmail.com</p>
-              <p>Pass: 1234</p>
-            </div>
-            <div>
-              <p className="text-slate-300 font-bold underline mb-1">Admin:</p>
-              <p>adminname@gmail.com</p>
-              <p>Pass: 1234</p>
-            </div>
-          </div>
-        </div>
+
       </div>
     </div>
   );

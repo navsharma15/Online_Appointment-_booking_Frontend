@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { 
   CalendarRange, 
   MoreHorizontal, 
@@ -6,17 +7,54 @@ import {
   Download,
   CalendarDays,
   Clock3,
-  Stethoscope
+  Stethoscope,
+  AlertCircle
 } from 'lucide-react';
 import DashboardLayout from '../../components/dashboard/DashboardLayout';
+import { useAuth } from '../../context/AuthContext';
 
 const MyAppointments = () => {
-  const appointments = [
-    { id: '1', service: 'Dental Checkup', date: 'March 30, 2026', time: '10:00 AM', status: 'Upcoming', provider: 'Dr. Sarah Wilson' },
-    { id: '2', service: 'Eye Examination', date: 'April 05, 2026', time: '02:30 PM', status: 'Upcoming', provider: 'Dr. Michael Chen' },
-    { id: '3', service: 'General Consultation', date: 'March 20, 2026', time: '09:00 AM', status: 'Completed', provider: 'Dr. Amanda Rivera' },
-    { id: '4', service: 'Blood Test', date: 'March 15, 2026', time: '11:00 AM', status: 'Cancelled', provider: 'Dr. John Doe' },
-  ];
+  const [appointments, setAppointments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      if (!user?.id) return;
+      const token = localStorage.getItem('hub_token');
+      try {
+        const response = await axios.get(`http://localhost:5000/api/appointments/user/${user.id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setAppointments(response.data);
+      } catch (err) {
+        setError('Failed to load appointments');
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, [user]);
+
+  const handleCancel = async (appointmentId) => {
+    if (!window.confirm('Are you sure you want to cancel this appointment?')) return;
+    
+    const token = localStorage.getItem('hub_token');
+    try {
+      await axios.delete(`http://localhost:5000/api/appointments/${appointmentId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      // Update local state
+      setAppointments(appointments.map(apt => 
+        apt._id === appointmentId ? { ...apt, status: 'cancelled' } : apt
+      ));
+    } catch (err) {
+      alert('Failed to cancel appointment');
+    }
+  };
 
   return (
     <DashboardLayout role="user">
@@ -44,19 +82,12 @@ const MyAppointments = () => {
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="flex items-center gap-3 overflow-x-auto pb-1">
-           {['All', 'Upcoming', 'Completed', 'Cancelled'].map((tab, i) => (
-             <button 
-               key={tab}
-               className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
-                 i === 0 ? 'bg-blue-600 text-white shadow-md shadow-blue-900/10' : 'bg-slate-900 text-slate-400 border border-white/5 hover:bg-slate-800'
-               }`}
-             >
-               {tab}
-             </button>
-           ))}
-        </div>
+        {error && (
+          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-400 text-sm">
+            <AlertCircle className="w-5 h-5" />
+            <p>{error}</p>
+          </div>
+        )}
 
         {/* List Table */}
         <div className="bg-slate-900 border border-white/10 rounded-xl overflow-hidden shadow-sm">
@@ -64,25 +95,33 @@ const MyAppointments = () => {
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-slate-800 border-b border-white/5">
-                  <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Service & Doctor</th>
+                  <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Doctor & Service</th>
                   <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Scheduled For</th>
                   <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
                   <th className="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {appointments.map((apt) => (
-                  <tr key={apt.id} className="hover:bg-slate-800 transition-colors">
+                {isLoading ? (
+                  <tr>
+                    <td colSpan="4" className="px-6 py-10 text-center text-slate-500 text-sm italic">Loading appointments...</td>
+                  </tr>
+                ) : appointments.length === 0 ? (
+                  <tr>
+                    <td colSpan="4" className="px-6 py-10 text-center text-slate-500 text-sm italic">No appointments found.</td>
+                  </tr>
+                ) : appointments.map((apt) => (
+                  <tr key={apt._id} className="hover:bg-slate-800 transition-colors">
                     <td className="px-6 py-5">
                        <div className="flex items-center gap-3">
                           <div className={`p-2.5 rounded-lg border border-white/5 ${
-                             apt.status === 'Cancelled' ? 'text-red-400 bg-red-400/5' : 'text-blue-400 bg-blue-400/5'
+                             apt.status === 'cancelled' ? 'text-red-400 bg-red-400/5' : 'text-blue-400 bg-blue-400/5'
                           }`}>
                              <Stethoscope className="w-4 h-4" />
                           </div>
                           <div>
-                             <p className="text-sm font-bold text-white">{apt.service}</p>
-                             <p className="text-xs text-slate-500">{apt.provider}</p>
+                             <p className="text-sm font-bold text-white">{apt.doctor_id?.name || 'Unknown Doctor'}</p>
+                             <p className="text-xs text-slate-500">{apt.doctor_id?.specialization || 'Consultation'}</p>
                           </div>
                        </div>
                     </td>
@@ -90,7 +129,7 @@ const MyAppointments = () => {
                        <div className="space-y-1">
                           <p className="text-xs text-white flex items-center gap-2">
                              <CalendarDays className="w-3.5 h-3.5 text-blue-500" />
-                             {apt.date}
+                             {new Date(apt.date).toLocaleDateString()}
                           </p>
                           <p className="text-[10px] text-slate-500 flex items-center gap-2">
                              <Clock3 className="w-3.5 h-3.5" />
@@ -100,8 +139,8 @@ const MyAppointments = () => {
                     </td>
                     <td className="px-6 py-5">
                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
-                          apt.status === 'Upcoming' ? 'bg-blue-500/10 text-blue-400 border-blue-400/10' :
-                          apt.status === 'Completed' ? 'bg-teal-500/10 text-teal-400 border-teal-400/10' :
+                          apt.status === 'pending' ? 'bg-blue-500/10 text-blue-400 border-blue-400/10' :
+                          apt.status === 'confirmed' ? 'bg-teal-500/10 text-teal-400 border-teal-400/10' :
                           'bg-red-500/10 text-red-500 border-red-500/10'
                        }`}>
                           {apt.status}
@@ -109,8 +148,13 @@ const MyAppointments = () => {
                     </td>
                     <td className="px-6 py-5 text-right">
                        <div className="flex items-center justify-end gap-2">
-                          {apt.status === 'Upcoming' && (
-                            <button className="px-3 py-1.5 rounded-md text-[10px] font-bold uppercase bg-slate-950 border border-white/5 text-red-400 hover:bg-red-400/10 transition-all">Cancel</button>
+                          {apt.status !== 'cancelled' && (
+                            <button 
+                              onClick={() => handleCancel(apt._id)}
+                              className="px-3 py-1.5 rounded-md text-[10px] font-bold uppercase bg-slate-950 border border-white/5 text-red-400 hover:bg-red-400/10 transition-all"
+                            >
+                              Cancel
+                            </button>
                           )}
                           <button className="p-2 rounded-lg bg-slate-800 border border-white/10 text-slate-500 hover:text-white transition-colors">
                              <MoreHorizontal className="w-4 h-4" />
@@ -121,15 +165,6 @@ const MyAppointments = () => {
                 ))}
               </tbody>
             </table>
-          </div>
-          
-          <div className="p-4 bg-slate-800 border-t border-white/5 flex items-center justify-between">
-             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Page 1 of 4</p>
-             <div className="flex gap-1.5">
-                <button className="w-7 h-7 rounded bg-slate-900 border border-white/5 flex items-center justify-center text-[10px] text-white font-bold transition-all shadow-md">1</button>
-                <button className="w-7 h-7 rounded bg-slate-800 border border-white/5 flex items-center justify-center text-[10px] text-slate-500 hover:bg-slate-700 transition-all">2</button>
-                <button className="w-7 h-7 rounded bg-slate-800 border border-white/5 flex items-center justify-center text-[10px] text-slate-500 hover:bg-slate-700 transition-all">3</button>
-             </div>
           </div>
         </div>
 
