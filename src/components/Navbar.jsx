@@ -15,11 +15,11 @@ const Navbar = () => {
   }, []);
 
   const navLinks = [
-    { name: 'Home', href: '#home' },
-    { name: 'Features', href: '#features' },
-    { name: 'How It Works', href: '#how-it-works' },
-    { name: 'Pricing', href: '#pricing' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'Home', to: '/' },
+    { name: 'Features', to: '/#features' },
+    { name: 'How It Works', to: '/#how-it-works' },
+    { name: 'Pricing', to: '/#pricing' },
+    { name: 'Contact', to: '/contact' },
   ];
 
   return (
@@ -43,13 +43,13 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
-                href={link.href}
+                to={link.to}
                 className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
               >
                 {link.name}
-              </a>
+              </Link>
             ))}
           </nav>
 
@@ -78,14 +78,14 @@ const Navbar = () => {
         <div className="md:hidden bg-slate-900 border-t border-slate-800">
           <div className="px-4 py-4 space-y-4 flex flex-col items-center">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
-                href={link.href}
+                to={link.to}
                 className="text-white hover:text-blue-400 text-lg py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {link.name}
-              </a>
+              </Link>
             ))}
             <div className="w-full flex flex-col gap-2 pt-4 border-t border-slate-800">
               <Link to="/login" className="w-full py-2 text-center text-white" onClick={() => setMobileMenuOpen(false)}>Login</Link>
