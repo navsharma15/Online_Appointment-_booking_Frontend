@@ -34,7 +34,7 @@ const BookAppointment = () => {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/doctors');
+        const response = await axios.get('/api/doctors');
         setDoctors(response.data);
       } catch (err) {
         console.error('Failed to fetch doctors', err);
@@ -56,7 +56,7 @@ const BookAppointment = () => {
     const token = localStorage.getItem('hub_token');
 
     try {
-      await axios.post('http://localhost:5000/api/appointments', {
+      await axios.post('/api/appointments', {
         doctor_id: bookingData.doctor_id,
         date: bookingData.date,
         time: bookingData.time

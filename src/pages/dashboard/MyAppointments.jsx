@@ -24,7 +24,7 @@ const MyAppointments = () => {
       if (!user?.id) return;
       const token = localStorage.getItem('hub_token');
       try {
-        const response = await axios.get(`http://localhost:5000/api/appointments/user/${user.id}`, {
+        const response = await axios.get(`/api/appointments/user/${user.id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setAppointments(response.data);
@@ -44,7 +44,7 @@ const MyAppointments = () => {
     
     const token = localStorage.getItem('hub_token');
     try {
-      await axios.delete(`http://localhost:5000/api/appointments/${appointmentId}`, {
+      await axios.delete(`/api/appointments/${appointmentId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       // Update local state
