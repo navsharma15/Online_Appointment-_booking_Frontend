@@ -1,64 +1,43 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import { createContext, useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
 
-const API_URL = '/api';
-
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
-  useEffect(() => {
-    const savedUser = localStorage.getItem('hub_user');
-    const token = localStorage.getItem('hub_token');
-    if (savedUser && token) {
-      setUser(JSON.parse(savedUser));
-    }
-    setLoading(false);
-  }, []);
+    useEffect(() => {
+        const storedUser = localStorage.getItem('userInfo');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
+        setLoading(false);
+    }, []);
 
-  const login = async (email, password) => {
-    try {
-      const response = await axios.post(`${API_URL}/login`, { email, password });
-      const { token, user: userData } = response.data;
-      
-      setUser(userData);
-      localStorage.setItem('hub_user', JSON.stringify(userData));
-      localStorage.setItem('hub_token', token);
-      
-      return { success: true };
-    } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Login failed' 
-      };
-    }
-  };
+    const login = (userData) => {
+        localStorage.setItem('userInfo', JSON.stringify(userData));
+        setUser(userData);
+    };
 
-  const signup = async (userData) => {
-    try {
-      await axios.post(`${API_URL}/register`, userData);
-      return { success: true };
-    } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Signup failed' 
-      };
-    }
-  };
+    const logout = () => {
+        localStorage.removeItem('userInfo');
+        setUser(null);
+        navigate('/login');
+    };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('hub_user');
-    localStorage.removeItem('hub_token');
-  };
+    const updateUserInfo = (newData) => {
+        const updatedUser = { ...user, ...newData };
+        localStorage.setItem('userInfo', JSON.stringify(updatedUser));
+        setUser(updatedUser);
+    };
 
-  return (
-    <AuthContext.Provider value={{ user, login, signup, logout, loading }}>
-      {children}
-    </AuthContext.Provider>
-  );
+    return (
+        <AuthContext.Provider value={{ user, login, logout, updateUserInfo, loading }}>
+            {!loading && children}
+        </AuthContext.Provider>
+    );
 };
 
 export const useAuth = () => useContext(AuthContext);

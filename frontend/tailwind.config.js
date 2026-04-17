@@ -7,35 +7,46 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: {
-          light: '#6d28d9', // Purple
-          DEFAULT: '#4f46e5', // Indigo
-          dark: '#1e1b4b',
+        indigo: {
+          950: '#0d0d1a',
         },
-        accent: {
-          teal: '#2dd4bf',
-          blue: '#3b82f6',
-          green: '#22c55e',
-        }
-      },
-      backgroundImage: {
-        'gradient-main': 'radial-gradient(circle at top left, #2980b9 0%, #2c3e50 100%)',
-        'ref-gradient': 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 40%, #2dd4bf 100%)',
-        'glass-gradient': 'linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1))',
-      },
-      boxShadow: {
-        'glow-blue': '0 0 20px rgba(59, 130, 246, 0.5)',
-        'glow-teal': '0 0 20px rgba(45, 212, 191, 0.5)',
-        'glow-purple': '0 0 20px rgba(109, 40, 217, 0.5)',
-        'glow-green': '0 0 20px rgba(34, 197, 94, 0.5)',
-      },
-      backdropBlur: {
-        'glass': '12px',
+        violet: {
+          950: '#0e0a1f',
+        },
       },
       fontFamily: {
-        sans: ['"Outfit"', 'sans-serif'],
-        outfit: ['"Outfit"', 'sans-serif'],
-      }
+        sans: ['"Inter"', 'system-ui', 'sans-serif'],
+      },
+      animation: {
+        'float': 'float 6s ease-in-out infinite',
+        'float-delay': 'float 6s ease-in-out 3s infinite',
+        'spin-slow': 'spin 20s linear infinite',
+        'pulse-slow': 'pulse 3s ease-in-out infinite',
+        'shimmer': 'shimmer 2.5s linear infinite',
+        'fade-in-up': 'fadeInUp 0.7s ease forwards',
+        'glow': 'glow 2s ease-in-out infinite',
+      },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-24px)' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% center' },
+          '100%': { backgroundPosition: '200% center' },
+        },
+        fadeInUp: {
+          '0%': { opacity: '0', transform: 'translateY(30px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        glow: {
+          '0%, 100%': { boxShadow: '0 0 20px rgba(99,102,241,0.3)' },
+          '50%': { boxShadow: '0 0 60px rgba(99,102,241,0.6)' },
+        },
+      },
+      backgroundSize: {
+        '200%': '200%',
+      },
     },
   },
   plugins: [],

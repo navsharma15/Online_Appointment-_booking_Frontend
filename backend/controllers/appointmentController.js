@@ -1,71 +1,81 @@
-const Appointment = require('../models/Appointment');
+import Appointment from '../models/Appointment.js';
+import Notification from '../models/Notification.js';
+import User from '../models/User.js';
 
-exports.bookAppointment = async (req, res) => {
-    const { doctor_id, date, time } = req.body;
-    const user_id = req.user.id; // From auth middleware
+export const createAppointment = async (req, res) => {
+    const { receiverId } = req.body;
+    const senderId = req.user._id;
 
-    try {
-        // Check if slot is already taken
-        const isTaken = await Appointment.findOne({ 
-            doctor_id, 
-            date, 
-            time, 
-            status: { $ne: 'cancelled' } 
-        });
-
-        if (isTaken) {
-            return res.status(400).json({ message: 'This slot is already booked. Please choose another time.' });
-        }
-
-        const newAppointment = await Appointment.create({
-            user_id,
-            doctor_id,
-            date,
-            time
-        });
-
-        res.status(201).json({ 
-            message: 'Appointment booked successfully', 
-            appointment: newAppointment 
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
+    if (senderId.toString() === receiverId) {
+        return res.status(400).json({ message: 'You cannot book an appointment with yourself' });
     }
+
+    const receiver = await User.findById(receiverId);
+    if (!receiver) {
+        return res.status(404).json({ message: 'Receiver not found' });
+    }
+
+    const existingAppointment = await Appointment.findOne({
+        senderId,
+        receiverId,
+        status: 'pending'
+    });
+
+    if (existingAppointment) {
+        return res.status(400).json({ message: 'Appointment request already pending' });
+    }
+
+    const appointment = await Appointment.create({
+        senderId,
+        receiverId
+    });
+
+    // Create notification for receiver
+    await Notification.create({
+        userId: receiverId,
+        message: `You have a new appointment request from ${req.user.name}`
+    });
+
+    res.status(201).json(appointment);
 };
 
-exports.getUserAppointments = async (req, res) => {
-    const user_id = req.params.id;
-    
-    // Safety check: users can only see their own appointments
-    if (user_id !== req.user.id) {
-        return res.status(403).json({ message: 'Unauthorized' });
+export const respondToAppointment = async (req, res) => {
+    const { appointmentId, status } = req.body;
+
+    if (!['accepted', 'rejected'].includes(status)) {
+        return res.status(400).json({ message: 'Invalid status' });
     }
 
-    try {
-        const appointments = await Appointment.find({ user_id })
-            .populate('doctor_id', 'name specialization')
-            .sort({ date: -1, time: 1 });
-            
-        res.json(appointments);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server error' });
+    const appointment = await Appointment.findById(appointmentId).populate('receiverId', 'name');
+    if (!appointment) {
+        return res.status(404).json({ message: 'Appointment not found' });
     }
+
+    if (appointment.receiverId._id.toString() !== req.user._id.toString()) {
+        return res.status(401).json({ message: 'Not authorized to respond to this appointment' });
+    }
+
+    appointment.status = status;
+    await appointment.save();
+
+    // Create notification for sender
+    await Notification.create({
+        userId: appointment.senderId,
+        message: `Your appointment request with ${req.user.name} was ${status}`
+    });
+
+    res.json(appointment);
 };
 
-exports.cancelAppointment = async (req, res) => {
-    try {
-        const appointmentId = req.params.id;
-        const appointment = await Appointment.findByIdAndUpdate(
-            appointmentId, 
-            { status: 'cancelled' },
-            { new: true }
-        );
+export const getMyAppointments = async (req, res) => {
+    const userId = req.user._id;
 
-        if (!appointment) return res.status(404).json({ message: 'Appointment not found' });
-        res.json({ message: 'Appointment cancelled successfully', appointment });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
-    }
+    const appointments = await Appointment.find({
+        $or: [{ senderId: userId }, { receiverId: userId }]
+    })
+    .populate('senderId', 'name email profileImage category title')
+    .populate('receiverId', 'name email profileImage category title')
+    .sort({ createdAt: -1 });
+
+    res.json(appointments);
 };

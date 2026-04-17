@@ -1,13 +1,29 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const appointmentSchema = new mongoose.Schema({
-    user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    doctor_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Doctor', required: true },
-    date: { type: Date, required: true },
-    time: { type: String, required: true },
-    status: { type: String, enum: ['pending', 'confirmed', 'cancelled'], default: 'pending' },
-    created_at: { type: Date, default: Date.now }
+    senderId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    receiverId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    status: {
+        type: String,
+        enum: ['pending', 'accepted', 'rejected'],
+        default: 'pending'
+    }
+}, {
+    timestamps: true
 });
 
-// Prevent double booking at schema level if possible, but easier in controller
-module.exports = mongoose.model('Appointment', appointmentSchema);
+// Indexes for faster querying when getting user appointments
+appointmentSchema.index({ senderId: 1, createdAt: -1 });
+appointmentSchema.index({ receiverId: 1, createdAt: -1 });
+
+const Appointment = mongoose.model('Appointment', appointmentSchema);
+
+export default Appointment;

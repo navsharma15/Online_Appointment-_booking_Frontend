@@ -1,31 +1,16 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 
-let cachedConnection = null;
+dotenv.config();
 
 const connectDB = async () => {
-    if (cachedConnection) {
-        return cachedConnection;
-    }
-    
     try {
-        const uri = process.env.MONGODB_URI;
-        if (!uri) {
-            throw new Error("MONGODB_URI is missing from environment variables.");
-        }
-        const conn = await mongoose.connect(uri, { family: 4 });
-
-        cachedConnection = conn;
-        console.log('MongoDB Connected successfully!');
-        return conn;
+        const conn = await mongoose.connect(process.env.MONGO_URI);
+        console.log(`MongoDB Connected: ${conn.connection.host}`);
     } catch (error) {
-        if (error.message.includes('ECONNREFUSED')) {
-            console.error('MongoDB Connection Error: Connection Refused. Please check your internet connection or if your IP is allowlisted in MongoDB Atlas.');
-        } else {
-            console.error('MongoDB Connection Error:', error.message);
-        }
-        throw error;
+        console.error(`Error: ${error.message}`);
+        process.exit(1);
     }
-
 };
 
-module.exports = connectDB;
+export default connectDB;

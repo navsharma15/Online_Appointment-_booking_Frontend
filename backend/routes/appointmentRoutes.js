@@ -1,11 +1,13 @@
-const express = require('express');
-const { bookAppointment, getUserAppointments, cancelAppointment } = require('../controllers/appointmentController');
-const protect = require('../middleware/auth');
+import express from 'express';
+import { createAppointment, respondToAppointment, getMyAppointments } from '../controllers/appointmentController.js';
+import { protect } from '../middleware/authMiddleware.js';
+import { validate } from '../middleware/validateMiddleware.js';
+import { requestAppointmentSchema, respondAppointmentSchema } from '../validations/appointmentValidation.js';
 
 const router = express.Router();
 
-router.post('/', protect, bookAppointment);
-router.get('/user/:id', protect, getUserAppointments);
-router.delete('/:id', protect, cancelAppointment);
+router.post('/request', protect, validate(requestAppointmentSchema), createAppointment);
+router.post('/respond', protect, validate(respondAppointmentSchema), respondToAppointment);
+router.get('/', protect, getMyAppointments);
 
-module.exports = router;
+export default router;
