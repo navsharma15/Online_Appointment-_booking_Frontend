@@ -1,7 +1,12 @@
 import axios from 'axios';
 
+const rawEnvUrl = import.meta.env.VITE_API_URL;
+const apiUrl = rawEnvUrl 
+    ? (rawEnvUrl.endsWith('/api') ? rawEnvUrl : `${rawEnvUrl}/api`)
+    : 'http://localhost:5000/api';
+
 const API = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+    baseURL: apiUrl,
 });
 
 // Interceptor to add token to requests
