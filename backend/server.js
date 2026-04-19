@@ -48,9 +48,6 @@ app.use('/api/appointments', appointmentRoutes);
 app.use('/api/notifications', notificationRoutes);
 
 // Health check
-app.get("/", (req, res) => {
-  res.send("API is running...");
-});
 
 // Error handler
 app.use((err, req, res, next) => {
